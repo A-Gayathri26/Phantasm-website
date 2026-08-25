@@ -1,63 +1,95 @@
 import { useMemo } from 'react';
 import * as THREE from 'three';
-import { JOURNEY } from './config';
+import { JOURNEY, GROUND } from './config';
+
+// Simple deterministic hash — same trick used elsewhere in this scene —
+// keyed by grid cell so neighbouring slabs get stable-but-uncorrelated
+// height/tone instead of a smooth wave rolling across the whole ground.
+function hash(ix, iz) {
+  const s = Math.sin(ix * 12.9898 + iz * 78.233) * 43758.5453;
+  return s - Math.floor(s);
+}
+
+function buildStrip({ xMin, xMax, zMin, zMax, cellSize, colorA, colorB, groove, heightScale }) {
+  const width = xMax - xMin;
+  const length = zMax - zMin;
+  const segsPerCell = 2.2;
+  const segsX = Math.max(2, Math.round((width / cellSize) * segsPerCell));
+  const segsZ = Math.max(2, Math.round((length / cellSize) * segsPerCell));
+
+  const geo = new THREE.PlaneGeometry(width, length, segsX, segsZ);
+  geo.rotateX(-Math.PI / 2);
+  geo.translate(xMin + width / 2, 0, zMin + length / 2);
+
+  const pos = geo.attributes.position;
+  const colors = new Float32Array(pos.count * 3);
+  const cA = new THREE.Color(colorA);
+  const cB = new THREE.Color(colorB);
+  const cG = new THREE.Color(groove);
+  const grooveWidth = 0.16;
+
+  for (let i = 0; i < pos.count; i++) {
+    const x = pos.getX(i);
+    const z = pos.getZ(i);
+
+    const cellX = Math.floor(x / cellSize);
+    const cellZ = Math.floor(z / cellSize);
+    const fx = x / cellSize - cellX;
+    const fz = z / cellSize - cellZ;
+
+    const edgeDist = Math.min(fx, 1 - fx, fz, 1 - fz) / grooveWidth;
+    const inGroove = edgeDist < 1;
+
+    const slabHeight = (hash(cellX, cellZ) - 0.5) * heightScale;
+    const grooveDepth = inGroove ? (1 - edgeDist) * heightScale * 0.6 : 0;
+    pos.setY(i, slabHeight - grooveDepth);
+
+    const tone = cA.clone().lerp(cB, hash(cellX + 11, cellZ + 7));
+    const c = inGroove ? tone.clone().lerp(cG, 1 - edgeDist) : tone;
+    colors[i * 3] = c.r;
+    colors[i * 3 + 1] = c.g;
+    colors[i * 3 + 2] = c.b;
+  }
+
+  geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+  geo.computeVertexNormals();
+  return geo;
+}
 
 /**
- * The ground was a single flat, single-color plane — reads as "plain" no
- * matter how good the lighting is. This displaces vertices with a cheap
- * multi-frequency sine field (no noise-library dependency) for gentle
- * unevenness, and paints subtle per-vertex color variation between two
- * dark stone tones so it doesn't look like one flat material either.
- * Static geometry, built once — no runtime cost beyond the one draw call
- * the flat plane already had.
+ * The flagstone pathway now covers the full ground width instead of just
+ * a narrow centre strip flanked by a separate coarse "rough ground"
+ * region — that outer region is what was reading as flat, pale, and
+ * textureless in-scene (its wider cell size and lower contrast washed
+ * out under this scene's bright ambient/hemisphere lighting). One
+ * consistent flagstone treatment edge-to-edge avoids that mismatch
+ * entirely. Colors are pulled a bit darker than before for the same
+ * reason — more headroom before that lighting brightens them out.
+ *
+ * Still one static geometry, built once via useMemo — no per-frame cost.
  */
 export default function Ground() {
   const geometry = useMemo(() => {
-    const width = 60;
-    const length = Math.abs(JOURNEY.cameraStartZ - JOURNEY.cameraEndZ) + 80;
-    const centerZ = (JOURNEY.cameraStartZ + JOURNEY.cameraEndZ) / 2;
+    const zMin = JOURNEY.cameraEndZ - 40;
+    const zMax = JOURNEY.cameraStartZ + 40;
+    const half = GROUND.width / 2;
 
-    const segsX = 48;
-    const segsZ = Math.round(length / 4);
-
-    const geo = new THREE.PlaneGeometry(width, length, segsX, segsZ);
-    geo.rotateX(-Math.PI / 2);
-    geo.translate(0, 0, centerZ);
-
-    const pos = geo.attributes.position;
-    const colors = new Float32Array(pos.count * 3);
-    const colorA = new THREE.Color('#14181f'); // base stone
-    const colorB = new THREE.Color('#1c222c'); // slightly lighter patches
-
-    for (let i = 0; i < pos.count; i++) {
-      const x = pos.getX(i);
-      const z = pos.getZ(i);
-
-      // Cheap layered undulation — not real noise, but reads fine as
-      // "uneven ground" at this scale rather than "broken flat plane".
-      const height =
-        Math.sin(x * 0.18 + z * 0.09) * 0.09 +
-        Math.sin(x * 0.4 - z * 0.22) * 0.035 +
-        Math.sin(z * 0.05) * 0.05;
-      pos.setY(i, height);
-
-      // Same field, different frequency, drives color variation instead
-      // of height so patches don't line up 1:1 with bumps.
-      const mix = (Math.sin(x * 0.12 + z * 0.31) + 1) / 2;
-      const c = colorA.clone().lerp(colorB, mix * 0.6);
-      colors[i * 3] = c.r;
-      colors[i * 3 + 1] = c.g;
-      colors[i * 3 + 2] = c.b;
-    }
-
-    geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-    geo.computeVertexNormals();
-    return geo;
+    return buildStrip({
+      xMin: -half,
+      xMax: half,
+      zMin,
+      zMax,
+      cellSize: GROUND.pathCellSize,
+      colorA: '#12151d',
+      colorB: '#1d2430',
+      groove: '#05070c',
+      heightScale: 0.09,
+    });
   }, []);
 
   return (
     <mesh geometry={geometry} receiveShadow>
-      <meshStandardMaterial vertexColors roughness={1} metalness={0} />
+      <meshStandardMaterial vertexColors roughness={0.68} metalness={0.04} />
     </mesh>
   );
 }

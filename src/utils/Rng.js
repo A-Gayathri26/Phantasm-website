@@ -26,6 +26,12 @@ export function generateTrackScatter({
   itemsPerCluster = 5,
   xRange = [4, 9],
   scaleRange = [0.7, 1.2],
+  // Z positions to keep clear of (e.g. the event gates) plus how close is
+  // too close. Used so a scattered prop (ruins) never lands right on top
+  // of a hand-placed landmark (an event gate) purely by chance — see
+  // Ruins.jsx. Left empty, this behaves exactly as before.
+  avoidZ = [],
+  avoidRadius = 0,
 }) {
   const rng = makeRng(seed);
   const items = [];
@@ -39,6 +45,11 @@ export function generateTrackScatter({
       const sideSign = rng() > 0.3 ? side : -side; // mostly one side, some scatter
       const x = sideSign * (xRange[0] + rng() * (xRange[1] - xRange[0]));
       const z = clusterZ - rng() * clusterSpacing * 0.5;
+      // Still consume the same rng() calls above even when skipping, so
+      // every later item's sequence stays identical regardless of which
+      // earlier items got excluded — the layout doesn't reshuffle itself
+      // when avoidRadius changes, it just thins out near the excluded Zs.
+      if (avoidRadius > 0 && avoidZ.some((az) => Math.abs(z - az) < avoidRadius)) continue;
       items.push({
         pos: [x, 0, z],
         rot: rng() * Math.PI * 2,

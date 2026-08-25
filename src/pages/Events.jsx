@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import EventWorld from '../components/events/EventWorld';
 import Navbar from '../components/layout/Navbar';
-import { JOURNEY } from '../components/events/config';
+import { JOURNEY, TRACK } from '../components/events/config';
 import { events, journeyStops } from '../data/events';
 import { useJourneyProgress } from '../hooks/useJourneyProgress';
 
@@ -14,7 +14,17 @@ export default function Events({ onSelectEvent }) {
   const trackRef = useRef(null);
   const progress = useJourneyProgress(trackRef);
 
-  const introOpacity = Math.max(0, 1 - progress / 0.15);
+  // Was a fixed 0.15 (fade over the first 15% of the *entire* journey's
+  // scroll, gate included) — on a track this long that meant the hero
+  // text outlived reaching the entrance by a wide margin. Deriving it
+  // from the actual distance to the gate keeps it correct automatically
+  // if cameraStartZ or the track layout changes later: the text is
+  // fully gone right as the camera reaches TRACK.entranceZ, whatever
+  // that distance happens to be.
+  const totalDistance = JOURNEY.cameraStartZ - JOURNEY.cameraEndZ;
+  const distanceToGate = JOURNEY.cameraStartZ - TRACK.entranceZ;
+  const introFadeEnd = distanceToGate / totalDistance;
+  const introOpacity = Math.max(0, 1 - progress / introFadeEnd);
 
   // Track height now scales with the actual journey distance (config.js),
   // so adding/removing events changes this automatically.

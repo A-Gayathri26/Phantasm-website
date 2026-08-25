@@ -1,60 +1,26 @@
-import { useMemo } from 'react';
-import * as THREE from 'three';
-
-let cachedTexture = null;
+import { useTexture } from '@react-three/drei';
+import { SKY, TEXTURE_PATHS } from './config';
 
 /**
- * Was using an external PNG via useTexture — that kept showing as a
- * checkerboard (WebGL's "texture failed to load" fallback) even after
- * confirming the file path, likely some remaining path/case/build-cache
- * issue on the local setup that's hard to debug remotely. Switched to a
- * canvas-generated soft cloud shape instead — same self-contained
- * technique as the working torch-glow texture (glowTexture.js), so there
- * is no external file that can go missing or fail to resolve. Fully
- * static per feedback — no drift, no growth animation, nothing in
- * useFrame.
+ * Real photographic cloud puffs (cloud-01.webp — a working asset now;
+ * an earlier pass fell back to a canvas-drawn approximation because the
+ * original PNG this pointed at was missing/failing to resolve).
+ *
+ * Still layered/tinted the same way that pass introduced for blending:
+ * several puffs, low opacity, each tinted toward the gradient sky's own
+ * tones (SkyBackdrop.jsx) rather than one flat color — that's what
+ * makes them read as sitting IN the sky instead of pasted over it, and
+ * that part of the design didn't depend on where the texture came from.
  */
-function getCloudTexture() {
-  if (cachedTexture) return cachedTexture;
-
-  const w = 256;
-  const h = 160;
-  const canvas = document.createElement('canvas');
-  canvas.width = w;
-  canvas.height = h;
-  const ctx = canvas.getContext('2d');
-
-  // Several overlapping soft blobs read as a wispy cloud mass rather than
-  // one perfect circle.
-  const blobs = [
-    [w * 0.3, h * 0.55, w * 0.28],
-    [w * 0.55, h * 0.4, w * 0.32],
-    [w * 0.72, h * 0.58, w * 0.24],
-    [w * 0.45, h * 0.65, w * 0.3],
-  ];
-
-  blobs.forEach(([bx, by, r]) => {
-    const gradient = ctx.createRadialGradient(bx, by, 0, bx, by, r);
-    gradient.addColorStop(0, 'rgba(255,255,255,0.9)');
-    gradient.addColorStop(0.5, 'rgba(255,255,255,0.35)');
-    gradient.addColorStop(1, 'rgba(255,255,255,0)');
-    ctx.fillStyle = gradient;
-    ctx.beginPath();
-    ctx.arc(bx, by, r, 0, Math.PI * 2);
-    ctx.fill();
-  });
-
-  cachedTexture = new THREE.CanvasTexture(canvas);
-  return cachedTexture;
-}
-
 export default function SkyClouds() {
-  const texture = useMemo(() => getCloudTexture(), []);
+  const texture = useTexture(TEXTURE_PATHS.cloud);
 
   const puffs = [
-    { position: [-14, 15, -30], scale: [22, 13, 1], opacity: 0.4 },
-    { position: [16, 17, -55], scale: [26, 15, 1], opacity: 0.32 },
-    { position: [-8, 16, -80], scale: [20, 12, 1], opacity: 0.36 },
+    { position: [-18, 13, -32], scale: [30, 19, 1], opacity: 0.34, color: SKY.horizonColor },
+    { position: [20, 16, -52], scale: [34, 22, 1], opacity: 0.26, color: SKY.midColor },
+    { position: [-10, 12, -74], scale: [26, 17, 1], opacity: 0.3, color: SKY.horizonColor },
+    { position: [12, 18, -98], scale: [22, 14, 1], opacity: 0.2, color: SKY.midColor },
+    { position: [-22, 14.5, -115], scale: [24, 15, 1], opacity: 0.24, color: SKY.glowColor },
   ];
 
   return (
@@ -63,13 +29,16 @@ export default function SkyClouds() {
         <sprite key={i} position={p.position} scale={p.scale}>
           <spriteMaterial
             map={texture}
-            color="#3a4668"
+            color={p.color}
             transparent
             opacity={p.opacity}
             depthWrite={false}
+            fog={false}
           />
         </sprite>
       ))}
     </group>
   );
 }
+
+useTexture.preload(TEXTURE_PATHS.cloud);

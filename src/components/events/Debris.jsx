@@ -3,7 +3,7 @@ import { useGLTF } from '@react-three/drei';
 import { cloneGltfScene } from '../../utils/cloneGltf';
 import { useFittedGLTF } from '../../utils/fitModel';
 import { generateTrackScatter } from '../../utils/rng';
-import { MODEL_PATHS, MODEL_FIT, JOURNEY } from './config';
+import { MODEL_PATHS, MODEL_FIT, PLATFORM } from './config';
 
 // Used sparingly, per the brief — wide spacing, few per cluster.
 export default function Debris() {
@@ -14,11 +14,15 @@ export default function Debris() {
       generateTrackScatter({
         seed: 777,
         startZ: -10,
-        endZ: JOURNEY.cameraEndZ - 10,
+        // Was cameraEndZ - 10 — ran almost to the very end, landing
+        // debris right next to the end platform. Buffer it back.
+        endZ: PLATFORM.endZ + PLATFORM.length / 2 + 20,
         clusterSpacing: 20,
         itemsPerCluster: 1,
         xRange: [3, 6.5],
         scaleRange: [0.6, 1.0],
+        avoidZ: [PLATFORM.startZ, PLATFORM.endZ],
+        avoidRadius: 8,
       }),
     []
   );

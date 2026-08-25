@@ -18,6 +18,11 @@ export default function AncientGate({ position = [0, 0, 0], rotation = [0, 0, 0]
       <group scale={fit.scale}>
         <primitive object={instance} position={fit.offset} />
       </group>
+      {/* No GateVoid here on purpose — the dark backing is for the 8
+          event gates only (see EventGate.jsx). On the entrance it was
+          reading as a visible black box rather than depth inside the
+          opening, and this is also the very first thing on screen, so
+          the mismatch was most visible right here. */}
     </group>
   );
 }

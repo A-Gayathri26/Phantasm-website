@@ -4,9 +4,10 @@ import { useThree } from '@react-three/fiber';
 import gsap from 'gsap';
 import { useFittedGLTF } from '../../utils/fitModel';
 import { cloneGltfScene } from '../../utils/cloneGltf';
-import { MODEL_PATHS, MODEL_FIT, TRACK } from './config';
-import FireLight from './FireLight';
+import { MODEL_PATHS, MODEL_FIT, TRACK, COLORS } from './config';
 import MagicLight from './MagicLight';
+import GateVoid from './GateVoid';
+import GatePortal from './GatePortal';
 
 const ZOOM_DURATION = 0.7; // seconds — matches the ~500-800ms spec range
 
@@ -25,7 +26,6 @@ export default function EventGate({ z, side, code, id, facingY = 0, onSelect, ca
   const instance = useMemo(() => cloneGltfScene(scene), [scene]);
 
   const x = side === 'right' ? TRACK.eventSideOffset : -TRACK.eventSideOffset;
-  const isEven = Number(code) % 2 === 0;
 
   // Unit vector the gate's opening faces, derived from the same facingY
   // computed in trackLayout.js (facingY rotates local +Z, so this is just
@@ -68,11 +68,22 @@ export default function EventGate({ z, side, code, id, facingY = 0, onSelect, ca
       <group scale={fit.scale}>
         <primitive object={instance} position={fit.offset} />
       </group>
-      {isEven ? (
-        <MagicLight position={[0, 1.3, 1.5]} intensity={hovered ? 5 : 3.6} />
-      ) : (
-        <FireLight position={[0, 1.3, 1.5]} intensity={hovered ? 5 : 3.6} />
-      )}
+      {/* A dark "void" behind the opening — without this, looking into
+          the arch just shows more of the same lit scene continuing
+          through it, which reads as an open frame rather than a real
+          entrance. Sized narrower/shorter than the stone opening itself
+          (was 5 x 5.5, matching or exceeding the actual archway, which
+          is what made its edges visible past the stonework as a dark
+          box). Still inside the local +Z-facing group, so it turns with
+          the gate. */}
+      <GateVoid width={1.9} height={2.5} depth={3.5} centerY={1.9} frontZ={-1.1} />
+      {/* Every event gate uses the same blue/violet magic portal now —
+          previously alternated blue/orange (magic/fire) by even/odd
+          event number; per feedback, all 8 event gates should read as
+          the blue portal (like the reference image), full stop. */}
+      <GatePortal colorA={COLORS.magic} colorB="#8b6bff" z={-0.85} />
+      <MagicLight position={[0, 1.3, 1.5]} intensity={hovered ? 5 : 3.6} />
+
     </group>
   );
 }

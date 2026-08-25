@@ -3,7 +3,8 @@ import { useFrame, useThree } from '@react-three/fiber';
 import { Stars } from '@react-three/drei';
 import { COLORS, FOG_DENSITY } from './config';
 import Ground from './Ground';
-import SkyClouds from './SkyClouds';
+import SkyBackdrop from './SkyBackdrop';
+import Galaxy from './Galaxy';
 import Moon from './Moon';
 
 const EMBER_COUNT = 70;
@@ -49,6 +50,10 @@ export default function Atmosphere() {
   return (
     <>
       <fogExp2 attach="fog" args={[COLORS.fog, FOG_DENSITY]} />
+      {/* Fallback flat colour behind/underneath the gradient sky dome —
+          only visible for a frame before SkyBackdrop mounts, or if it's
+          ever removed. The dome (inside skyRef below) is what actually
+          paints the sky now. */}
       <color attach="background" args={[COLORS.fog]} />
 
       {/* Soft sky-to-ground fill so shaded faces aren't pure black —
@@ -59,14 +64,24 @@ export default function Atmosphere() {
       <directionalLight color={COLORS.moon} intensity={1.3} position={[-6, 10, -4]} />
 
       <group ref={skyRef}>
+        {/* Gradient dome first so everything else in this group renders
+            in front of it. Gives the moon/stars/clouds an actual sky to
+            sit against instead of a flat colour. */}
+        <SkyBackdrop />
+
         {/* Was a flat-shaded procedural sphere; now the real optimized
             moon asset. Position (-6, 5.5, -20) is the same spot verified
             earlier to clear the camera's downward tilt with margin —
             Moon.jsx handles its own fit/centering internally. */}
         <Moon />
 
-        <Stars radius={40} depth={20} count={800} factor={2} saturation={0} fade speed={0.15} />
-        <SkyClouds />
+        {/* Slight saturation bump (was 0) so the star field itself picks
+            up a hint of color variety consistent with the galaxy band,
+            instead of being purely grayscale next to it. */}
+        <Stars radius={40} depth={20} count={900} factor={2} saturation={0.2} fade speed={0.15} />
+        {/* Replaces the old photographic cloud puffs (SkyClouds.jsx) —
+            see Galaxy.jsx for why. */}
+        <Galaxy />
       </group>
 
       {/* Ambient rising embers — static atmosphere fill, cheap (one

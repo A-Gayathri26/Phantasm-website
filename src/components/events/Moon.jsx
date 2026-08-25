@@ -35,8 +35,13 @@ export default function Moon() {
     });
   }, [instance]);
 
+  // Raised above and pushed further out than the tallest scenery piece
+  // (gate/towers fit to y=6.5-7) so the disc clears every monument's
+  // silhouette instead of settling in behind it. Previously y=5.5 sat
+  // below the gate's own height, which is what let it read as "inside"
+  // the tower.
   return (
-    <group position={[-6, 5.5, -20]}>
+    <group position={[-11, 9.5, -26]}>
       <group scale={scale}>
         <primitive object={instance} position={offset} />
       </group>

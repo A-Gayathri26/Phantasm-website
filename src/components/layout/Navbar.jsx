@@ -1,6 +1,10 @@
+import { useState } from 'react';
+
 const LINKS = ['HOME', 'EVENTS', 'SCHEDULE', 'GALLERY', 'SPONSORS', 'CONTACT'];
 
 export default function Navbar({ active = 'EVENTS' }) {
+  const [open, setOpen] = useState(false);
+
   return (
     <nav className="navbar">
       <div className="navbar-logo">
@@ -19,6 +23,38 @@ export default function Navbar({ active = 'EVENTS' }) {
       <a href="#" className="navbar-register">
         Register
       </a>
+
+      {/* Mobile only (see events.css) — .navbar-links/.navbar-register
+          above are hidden under 860px with nothing to reach them by, so
+          this toggle + panel is the actual way to navigate on a phone. */}
+      <button
+        type="button"
+        className="navbar-toggle"
+        aria-label={open ? 'Close menu' : 'Open menu'}
+        aria-expanded={open}
+        onClick={() => setOpen((o) => !o)}
+      >
+        <span />
+        <span />
+        <span />
+      </button>
+
+      {open && (
+        <ul className="navbar-mobile-menu">
+          {LINKS.map((link) => (
+            <li key={link} data-active={link === active}>
+              <a href="#" onClick={() => setOpen(false)}>
+                {link}
+              </a>
+            </li>
+          ))}
+          <li>
+            <a href="#" className="navbar-mobile-register" onClick={() => setOpen(false)}>
+              Register
+            </a>
+          </li>
+        </ul>
+      )}
     </nav>
   );
 }

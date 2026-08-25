@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { Object3D } from 'three';
 import { generateTrackScatter } from '../../utils/rng';
-import { JOURNEY } from './config';
+import { PLATFORM } from './config';
 
 const dummy = new Object3D();
 
@@ -19,11 +19,15 @@ export default function GroundClutter() {
       generateTrackScatter({
         seed: 1337,
         startZ: 4,
-        endZ: JOURNEY.cameraEndZ - 10,
+        // Was cameraEndZ - 10 — ran almost to the very end, scattering
+        // rocks right next to the end platform. Buffer it back.
+        endZ: PLATFORM.endZ + PLATFORM.length / 2 + 18,
         clusterSpacing: 10,
         itemsPerCluster: 4,
         xRange: [4.5, 8.5],
         scaleRange: [0.15, 0.5],
+        avoidZ: [PLATFORM.startZ, PLATFORM.endZ],
+        avoidRadius: 7,
       }),
     []
   );

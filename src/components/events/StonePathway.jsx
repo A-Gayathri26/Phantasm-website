@@ -8,15 +8,20 @@ const color = new THREE.Color();
 
 /**
  * Procedural flagstone tiles flanking the railway — built from a plain
- * BoxGeometry rather than the uploaded pathway asset. That asset turned
- * out to be some kind of rounded boulder/dome shape (bounding-box
- * dimensions alone couldn't reveal that — it only showed up once
- * rendered, tiled 100+ times, as rows of dome shapes rather than flat
- * pavers). A simple box gives full control over proportions and reads
- * correctly as a paving stone at a glance.
+ * BoxGeometry rather than the uploaded pathway asset (see prior note:
+ * that asset renders as domed boulders once tiled, not flat pavers).
  *
- * One InstancedMesh, one draw call, regardless of tile count — same
- * performance approach as GroundClutter.
+ * Reworked to match the reference art (dense, glossy, near-seamless wet
+ * flagstone) rather than the previous "scattered slabs" look:
+ *   - tiles sized/spaced tighter so grout lines read as thin seams, not
+ *     visible gaps between separate slabs
+ *   - size variance widened (not just uniform jitter) so the pattern
+ *     reads as irregular cut stone rather than a repeating grid
+ *   - MeshPhysicalMaterial + clearcoat for the wet-stone sheen/reflection
+ *     in the reference — MeshStandardMaterial has no clearcoat layer, so
+ *     it can only ever look matte no matter how low roughness goes
+ *
+ * Still one InstancedMesh, one draw call, regardless of tile count.
  */
 export default function StonePathway() {
   const meshRef = useRef();
@@ -30,17 +35,20 @@ export default function StonePathway() {
     const rowCount = Math.ceil(Math.abs(endZ - startZ) / rowSpacing);
 
     for (let row = 0; row < rowCount; row++) {
-      const z = startZ - row * rowSpacing - rng() * 0.5;
+      const z = startZ - row * rowSpacing - rng() * 0.3;
       PATHWAY.columnOffsets.forEach((colX) => {
         [-1, 1].forEach((sign) => {
           items.push({
-            x: sign * colX + (rng() - 0.5) * 0.5,
-            z: z + (rng() - 0.5) * 0.5,
-            rotY: (rng() - 0.5) * 0.25,
-            scaleX: 0.85 + rng() * 0.3,
-            scaleZ: 0.85 + rng() * 0.3,
-            heightJitter: rng() * 0.03,
-            shade: 0.75 + rng() * 0.35,
+            x: sign * colX + (rng() - 0.5) * 0.25,
+            z: z + (rng() - 0.5) * 0.25,
+            rotY: (rng() - 0.5) * 0.18,
+            // Wider size variance (was a tight 0.85-1.15 band) so
+            // neighboring tiles read as irregularly-cut stone rather than
+            // a uniform grid once packed this tightly.
+            scaleX: 0.75 + rng() * 0.55,
+            scaleZ: 0.75 + rng() * 0.55,
+            heightJitter: rng() * 0.025,
+            shade: 0.7 + rng() * 0.4,
           });
         });
       });
@@ -59,10 +67,10 @@ export default function StonePathway() {
       dummy.updateMatrix();
       mesh.setMatrixAt(i, dummy.matrix);
 
-      // Per-instance gray-scale variation so the path doesn't read as a
-      // single flat-colored slab repeated — subtle, not a texture, but
-      // enough to break uniformity.
-      color.setRGB(0.22 * t.shade, 0.24 * t.shade, 0.27 * t.shade);
+      // Per-instance gray-scale variation, pushed slightly cooler/darker
+      // on average so the clearcoat highlight has contrast to read
+      // against, matching the reference's dark-wet-stone base tone.
+      color.setRGB(0.16 * t.shade, 0.18 * t.shade, 0.22 * t.shade);
       mesh.setColorAt(i, color);
     });
 
@@ -72,8 +80,10 @@ export default function StonePathway() {
 
   return (
     <instancedMesh ref={meshRef} args={[null, null, tiles.length]} receiveShadow castShadow>
-      <boxGeometry args={[PATHWAY.tileTargetSize * 0.42, 0.1, PATHWAY.tileTargetSize * 0.42]} />
-      <meshStandardMaterial roughness={1} />
+      {/* was *0.42 — tightened to *0.48 so tiles pack closer together,
+          leaving thin grout seams instead of open gaps at this density */}
+      <boxGeometry args={[PATHWAY.tileTargetSize * 0.48, 0.1, PATHWAY.tileTargetSize * 0.48]} />
+      <meshPhysicalMaterial roughness={0.45} clearcoat={0.6} clearcoatRoughness={0.25} envMapIntensity={1.1} />
     </instancedMesh>
   );
 }

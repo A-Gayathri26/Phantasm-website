@@ -12,15 +12,17 @@ import { MODEL_PATHS, MODEL_FIT, RAILWAY_SEGMENT_LENGTH, TRACK } from './config'
 // the gate rotation logic.
 
 /**
- * For each event, a straight chain of rail segments forking off the main
- * line (x=0) and angling out to that event's gate. Not a curve (no curved
- * rail asset to work with) — a single constant-angle diagonal reads fine
- * at this scale and distance.
+ * For each event, a rail spur forking off the main line (x=0) and running
+ * up to that event's gate — a single APPROACH leg, mainline joint to the
+ * gate's position, angled diagonally.
  *
- * Reuses Railway.jsx's orientation convention: base rotation of Math.PI/2
- * aligns a segment's local-X (its measured long axis) with world -Z. A
- * spur at some angle off dead-ahead just adds that angle on top of the
- * same base rotation.
+ * There used to be a second "through" leg continuing past the gate along
+ * its own facing direction, on the idea that the track should visibly run
+ * through the opening. In practice it just showed up as a stray extra
+ * length of rail behind/through each arch leading nowhere (clicking a
+ * gate hands off to a separate static page — nothing ever travels that
+ * stretch), so it's removed. The spur now simply ends at the gate it
+ * leads into.
  */
 export default function DivergingTracks() {
   const { scene, fit } = useFittedGLTF(MODEL_PATHS.railway, MODEL_FIT.railway);
@@ -42,42 +44,31 @@ export default function DivergingTracks() {
       const k = Math.round((-rawStartZ - half) / RAILWAY_SEGMENT_LENGTH);
       const startZ = -(half + k * RAILWAY_SEGMENT_LENGTH);
 
-      const endX = (ev.side === 'right' ? 1 : -1) * TRACK.eventSideOffset;
-      const endZ = ev.z - TRACK.spurOvershoot;
+      const gateX = (ev.side === 'right' ? 1 : -1) * TRACK.eventSideOffset;
+      const gateZ = ev.z;
 
-      const dx = endX - startX;
-      const dz = endZ - startZ;
-      const length = Math.hypot(dx, dz);
-      const dirX = dx / length;
-      const dirZ = dz / length;
+      // --- Leg 1: approach, mainline joint -> gate position ---
+      const dxA = gateX - startX;
+      const dzA = gateZ - startZ;
+      const lengthA = Math.hypot(dxA, dzA);
+      const dirXA = dxA / lengthA;
+      const dirZA = dzA / lengthA;
+      // Same mapping as Railway.jsx's base rotation: local +X -> world
+      // (cos t, 0, -sin t), so t = atan2(-dz, dx).
+      const rotationYA = Math.atan2(-dzA, dxA);
+      const countA = Math.max(1, Math.round(lengthA / RAILWAY_SEGMENT_LENGTH));
 
-      // Rotation that maps the rail's local +X axis (its measured long
-      // axis, per Railway.jsx) onto the direction (dx, dz) in world space.
-      // three.js rotation.y=t maps local (1,0,0) -> world (cos t, 0, -sin t),
-      // so solving cos t = dx, -sin t = dz gives t = atan2(-dz, dx).
-      // Sanity check: straight ahead (dx=0, dz=-1) gives exactly Math.PI/2,
-      // matching Railway.jsx's own convention for the main line.
-      const rotationY = Math.atan2(-dz, dx);
-
-      // Fixed spacing of RAILWAY_SEGMENT_LENGTH per segment, same as
-      // Railway.jsx — NOT length/count. Dividing the target distance into
-      // `count` equal slices (the previous version) only avoids gaps when
-      // `length` happens to be an exact multiple of the segment length;
-      // otherwise every segment center is spaced by length/count while the
-      // rendered segment itself is still exactly RAILWAY_SEGMENT_LENGTH
-      // long, leaving a gap (or overlap) every time. +1 segment so the
-      // spur overshoots the target rather than stopping short of it.
-      const count = Math.ceil(length / RAILWAY_SEGMENT_LENGTH) + 1;
-
-      for (let i = 0; i < count; i++) {
+      for (let i = 0; i < countA; i++) {
         const dist = RAILWAY_SEGMENT_LENGTH * (i + 0.5);
+        if (dist > lengthA) break; // don't overshoot into leg 2's territory
         segs.push({
-          key: `${ev.id}-${i}`,
-          pos: [startX + dirX * dist, 0, startZ + dirZ * dist],
-          rotationY,
+          key: `${ev.id}-a${i}`,
+          pos: [startX + dirXA * dist, 0, startZ + dirZA * dist],
+          rotationY: rotationYA,
           clone: cloneGltfScene(scene),
         });
       }
+
     });
 
     return segs;

@@ -4,22 +4,32 @@ import * as THREE from 'three';
 import Atmosphere from './Atmosphere';
 import AncientGate from './AncientGate';
 import Railway from './Railway';
-import StonePathway from './StonePathway';
-import Ruins from './Ruins';
-import Debris from './Debris';
-import GroundClutter from './GroundClutter';
+import Platform from './Platform';
+import EventScenery from './EventScenery';
 import Minecart from './Minecart';
 import EventGates from './EventGates';
+import EventSignposts from './EventSignposts';
 import DivergingTracks from './DivergingTracks';
+// StonePathway.jsx removed — its InstancedMesh of tiles is what was
+// rendering as the wide grid of pale, washed-out slabs (MeshPhysicalMaterial
+// clearcoat under this scene's bright ambient/hemisphere lights). Ground.jsx
+// now paints both the paved walkway and the rough ground around it into one
+// unified mesh instead — see Ground.jsx and the GROUND block in config.js.
+//
+// Cloud sprites (Clouds.jsx, then SkyClouds.jsx) are gone entirely now —
+// see Galaxy.jsx for the procedural Milky Way band that replaced them in
+// Atmosphere.jsx.
 // AmbientTorches (glow sprites) removed per feedback — the floating orb
 // look wasn't landing. Local illumination along the mid-track is now
 // carried entirely by the global ambient/hemisphere/directional lights in
-// Atmosphere.jsx plus the real lights at the entrance and event gates.
+// Atmosphere.jsx plus the real lights at the entrance, event gates, and
+// direction signs.
 import FireLight from './FireLight';
 import MagicLight from './MagicLight';
 import JourneyCamera from './JourneyCamera';
 import Loader from './Loader';
-import { JOURNEY } from './config';
+import { JOURNEY, PLATFORM } from './config';
+import { getFinaleZ } from '../../utils/trackLayout';
 
 export default function EventWorld({ progress = 0, onSelectEvent }) {
   // Single authoritative camera position, written by JourneyCamera each
@@ -51,18 +61,24 @@ export default function EventWorld({ progress = 0, onSelectEvent }) {
         <Atmosphere />
 
         <AncientGate position={[0, 0, 0]} />
+        {/* Exit arch — same model/style as the entrance, standing just
+            past the last event gate and before the end platform/cart
+            stop, so the journey closes the way it opened. */}
+        <AncientGate position={[0, 0, getFinaleZ()]} />
         <Railway />
+        <Platform z={PLATFORM.startZ} />
+        <Platform z={PLATFORM.endZ} />
         <DivergingTracks />
-        <StonePathway />
-        <Ruins />
-        <Debris />
-        <GroundClutter />
+        <EventScenery />
         <EventGates onSelect={onSelectEvent} cameraState={cameraState} />
+        <EventSignposts />
         {/* AmbientTorches removed — see note near the import. */}
         <Minecart cameraState={cameraState} />
 
         <FireLight position={[-4, 1.4, 3]} intensity={3.2} />
         <MagicLight position={[4, 1.4, 3]} intensity={3.2} />
+        <FireLight position={[-4, 1.4, getFinaleZ() + 3]} intensity={3.2} />
+        <MagicLight position={[4, 1.4, getFinaleZ() + 3]} intensity={3.2} />
       </Suspense>
     </Canvas>
   );
