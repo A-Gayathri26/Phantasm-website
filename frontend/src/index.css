@@ -1,0 +1,87 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-serif: "Cinzel", serif;
+}
+
+html {
+  color-scheme: dark;
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: #02040a;
+  text-rendering: optimizeSpeed;
+}
+
+/* GPU-friendly animations */
+@keyframes drift-slow {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(-28px, -18px, 0); }
+}
+@keyframes drift-fast {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(36px, -14px, 0); }
+}
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.55; }
+}
+@keyframes twinkle {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 0.85; }
+}
+@keyframes ember-rise {
+  0% { transform: translate3d(0, 0, 0) scale(0.7); opacity: 0; }
+  12% { opacity: 0.75; }
+  100% { transform: translate3d(var(--dx, 16px), -100vh, 0) scale(1); opacity: 0; }
+}
+@keyframes float-hover {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, -5px, 0); }
+}
+
+.animate-drift-slow { animation: drift-slow 24s ease-in-out infinite; }
+.animate-drift-fast { animation: drift-fast 18s ease-in-out infinite; }
+.animate-pulse-glow { animation: pulse-glow 7s ease-in-out infinite; }
+.animate-twinkle { animation: twinkle 4.5s ease-in-out infinite; }
+.animate-ember { animation: ember-rise linear infinite; }
+.animate-float { animation: float-hover 6s ease-in-out infinite; }
+
+.contain-strict {
+  contain: strict;
+}
+
+.contain-paint {
+  contain: paint;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .motion-safe\:animate-drift-slow,
+  .motion-safe\:animate-drift-fast,
+  .motion-safe\:animate-pulse-glow,
+  .motion-safe\:animate-twinkle,
+  .motion-safe\:animate-ember,
+  .motion-safe\:animate-float,
+  .animate-drift-slow,
+  .animate-drift-fast,
+  .animate-pulse-glow,
+  .animate-twinkle,
+  .animate-ember,
+  .animate-float {
+    animation: none !important;
+  }
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* scrollbar */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: #050912; }
+::-webkit-scrollbar-thumb {
+  background: rgba(56, 189, 248, 0.18);
+  border-radius: 8px;
+}
+::-webkit-scrollbar-thumb:hover { background: rgba(56, 189, 248, 0.35); }
