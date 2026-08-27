@@ -19,7 +19,7 @@ cp .env.example .env      # edit DB creds / JWT secret
 Create the database (adjust name/user to match your .env):
 
 ```bash
-createdb phantasm_auth
+createdb phantasm
 ```
 
 Run migrations (creates `users` and `password_reset_tokens` tables):
