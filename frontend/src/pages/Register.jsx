@@ -37,8 +37,7 @@ export default function Register() {
       })
       if (res?.token) localStorage.setItem('authToken', res.token)
       if (res?.user) localStorage.setItem('authUser', JSON.stringify(res.user))
-      alert('Registration successful!')
-      navigate('/login')
+      navigate('/login', { replace: true })
     } catch (err) {
       setError(err.message)
     } finally {
@@ -53,10 +52,10 @@ export default function Register() {
         <form onSubmit={submit} className="space-y-4">
           <div className="register-item"><Field name="email" label="Email Address" type="email" autoComplete="email" placeholder="Enter your email address" icon="@" required /></div>
           <div className="register-item">
-            <span className="mb-2 block text-xs font-medium text-slate-300">Password</span>
-            <div className="field flex h-12 items-center rounded-xl border border-slate-700/80 bg-[#061524]/80 px-3">
-              <span className="mr-3 text-sm text-slate-500">◆</span>
-              <input name="password" type={showPassword ? 'text' : 'password'} placeholder="Create a password" className="w-full bg-transparent text-sm text-white outline-none placeholder:text-slate-600" required />
+            <span className="field-label mb-2 block text-xs font-medium text-slate-300">Password</span>
+            <div className="field flex h-12 items-center rounded-xl border border-slate-700/80 bg-[#061524]/80 px-3 shadow-[inset_0_0_0_1px_rgba(59,130,246,0.04)]">
+              <span className="mr-3 flex h-6 w-6 items-center justify-center rounded-md border border-sky-400/20 bg-sky-500/5 text-sm text-sky-200">◆</span>
+              <input name="password" type={showPassword ? 'text' : 'password'} placeholder="Create a password" className="field-input w-full bg-transparent text-sm text-white outline-none placeholder:text-slate-600" required />
               <button type="button" onClick={() => setShowPassword(v => !v)} className="ml-2 rounded-md px-2 py-1 text-xs text-slate-500 hover:text-sky-300">{showPassword ? 'HIDE' : 'SHOW'}</button>
             </div>
           </div>

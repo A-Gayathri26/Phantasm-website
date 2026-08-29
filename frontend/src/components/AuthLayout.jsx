@@ -47,12 +47,12 @@ export default function AuthLayout({ children, eyebrow, title, subtitle }) {
 
       <section className="relative z-10 flex w-full max-w-[470px] flex-col items-center">
         <div className="auth-logo mb-4 text-center">
-          <div className="mb-2 flex items-center justify-center gap-2 text-[9px] font-semibold uppercase tracking-[0.38em] text-sky-300/90 sm:text-[10px]">
+          <div className="auth-eyebrow mb-2 flex items-center justify-center gap-2 text-[9px] font-semibold uppercase tracking-[0.38em] text-sky-300/90 sm:text-[10px]">
             <span className="h-1.5 w-1.5 rounded-full bg-sky-400 shadow-[0_0_10px_#38bdf8]" />
             {eyebrow}
             <span className="h-1.5 w-1.5 rounded-full bg-sky-400 shadow-[0_0_10px_#38bdf8]" />
           </div>
-          <div className="mx-auto flex w-32 items-center justify-center gap-2">
+          <div className="auth-divider mx-auto flex w-32 items-center justify-center gap-2">
             <span className="h-px flex-1 bg-gradient-to-r from-transparent to-sky-400/60" />
             <span className="h-1.5 w-1.5 rotate-45 border border-sky-300/70" />
             <span className="h-px flex-1 bg-gradient-to-l from-transparent to-sky-400/60" />
@@ -60,8 +60,8 @@ export default function AuthLayout({ children, eyebrow, title, subtitle }) {
         </div>
 
         <div className="auth-heading mb-7 text-center">
-          <h1 className="text-3xl font-bold tracking-tight text-white drop-shadow-[0_0_18px_rgba(62,173,255,.12)] sm:text-[36px]">{title}</h1>
-          <p className="mt-2 text-sm text-slate-400">{subtitle}</p>
+          <h1 className="auth-title text-3xl font-bold tracking-tight text-white drop-shadow-[0_0_18px_rgba(62,173,255,.12)] sm:text-[36px]">{title}</h1>
+          <p className="auth-subtitle mt-2 text-sm text-slate-400">{subtitle}</p>
         </div>
 
         <div ref={cardArea} className="card-stage w-full [perspective:1000px]">

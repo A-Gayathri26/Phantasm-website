@@ -45,16 +45,16 @@ export default function Login() {
     <AuthLayout  title="Welcome Back!" subtitle="Login to continue">
       <div className="auth-card glass-card relative w-full rounded-3xl p-6 sm:p-8">
         <div className="absolute -top-7 left-1/2 flex h-14 w-14 -translate-x-1/2 items-center justify-center rounded-full border border-sky-400/80 bg-[#03101e] text-2xl shadow-[0_0_25px_rgba(0,136,255,.35)]">◉</div>
-        <h2 className="mb-7 mt-1 text-center text-xl font-semibold text-slate-100">Login to your account</h2>
+        <h2 className="auth-card-title mb-7 mt-1 text-center text-xl font-semibold text-slate-100">Login to your account</h2>
 
         <form onSubmit={submit} className="space-y-5">
           <div className="form-item"><Field name="email" label="Email Address" type="email" autoComplete="email" placeholder="Enter your email address" icon="@" required /></div>
 
           <div className="form-item">
-            <span className="mb-2 block text-xs font-medium text-slate-300">Password</span>
-            <div className="field flex h-12 items-center rounded-xl border border-slate-700/80 bg-[#061524]/80 px-3">
-              <span className="mr-3 text-sm text-slate-500">◆</span>
-              <input name="password" type={showPassword ? 'text' : 'password'} autoComplete="current-password" placeholder="Enter your password" className="w-full bg-transparent text-sm text-white outline-none placeholder:text-slate-600" required />
+            <span className="field-label mb-2 block text-xs font-medium text-slate-300">Password</span>
+            <div className="field flex h-12 items-center rounded-xl border border-slate-700/80 bg-[#061524]/80 px-3 shadow-[inset_0_0_0_1px_rgba(59,130,246,0.04)]">
+              <span className="mr-3 flex h-6 w-6 items-center justify-center rounded-md border border-sky-400/20 bg-sky-500/5 text-sm text-sky-200">◆</span>
+              <input name="password" type={showPassword ? 'text' : 'password'} autoComplete="current-password" placeholder="Enter your password" className="field-input w-full bg-transparent text-sm text-white outline-none placeholder:text-slate-600" required />
               <button type="button" onClick={() => setShowPassword(v => !v)} className="ml-2 rounded-md px-2 py-1 text-xs text-slate-500 hover:text-sky-300" aria-label={showPassword ? 'Hide password' : 'Show password'}>{showPassword ? 'HIDE' : 'SHOW'}</button>
             </div>
           </div>
