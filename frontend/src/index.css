@@ -1,12 +1,29 @@
 ﻿@import "tailwindcss";
 
-:root {
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system,
-    BlinkMacSystemFont, "Segoe UI", sans-serif;
-  color: #f7fbff;
-  background: #010712;
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
+@theme {
+  --font-gothic: "Cinzel Decorative", serif;
+  --font-serif2: "Cinzel", serif;
+  --font-body: "Inter", sans-serif;
+
+  --color-phantasm-bg: #000000;
+  --color-phantasm-navy: #020617;
+  --color-phantasm-blue: #3b82f6;
+  --color-phantasm-glow: #60a5fa;
+  --color-phantasm-dim: #1e293b;
+
+  --shadow-glow: 0 0 20px rgba(59, 130, 246, 0.6);
+  --shadow-glow-lg: 0 0 40px rgba(59, 130, 246, 0.4);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: black;
+  font-family: var(--font-body);
+  margin: 0;
+  overflow-x: hidden;
 }
 
 * {
@@ -20,11 +37,6 @@ body,
   margin: 0;
 }
 
-body {
-  min-width: 320px;
-  overflow-x: hidden;
-}
-
 button,
 input {
   font: inherit;
@@ -34,9 +46,13 @@ button {
   -webkit-tap-highlight-color: transparent;
 }
 
-/* =========================================
-   MAIN BACKGROUND
-========================================= */
+.shadow-glow {
+  box-shadow: var(--shadow-glow);
+}
+
+.shadow-glow-lg {
+  box-shadow: var(--shadow-glow-lg);
+}
 
 .auth-shell {
   position: relative;
@@ -45,11 +61,7 @@ button {
   overflow: hidden;
   isolation: isolate;
   background:
-    linear-gradient(
-      135deg,
-      rgba(2, 8, 23, 0.18),
-      rgba(2, 8, 23, 0.38)
-    ),
+    linear-gradient(135deg, rgba(2, 8, 23, 0.18), rgba(2, 8, 23, 0.38)),
     url("/assets/background.webp");
   background-size: cover;
   background-position: center center;
@@ -57,23 +69,14 @@ button {
   background-attachment: fixed;
 }
 
-/* Subtle dark overlay for readability */
 .auth-shell::after {
   content: "";
   position: absolute;
   inset: 0;
   z-index: -1;
-  background: linear-gradient(
-    to bottom,
-    rgba(1, 7, 16, 0.08),
-    rgba(1, 7, 16, 0.28)
-  );
+  background: linear-gradient(to bottom, rgba(1, 7, 16, 0.08), rgba(1, 7, 16, 0.28));
   pointer-events: none;
 }
-
-/* =========================================
-   GRID EFFECT
-========================================= */
 
 .grid-overlay {
   position: absolute;
@@ -81,22 +84,11 @@ button {
   z-index: 0;
   opacity: 0.1;
   background-image:
-    linear-gradient(
-      rgba(61, 158, 255, 0.14) 1px,
-      transparent 1px
-    ),
-    linear-gradient(
-      90deg,
-      rgba(61, 158, 255, 0.14) 1px,
-      transparent 1px
-    );
+    linear-gradient(rgba(61, 158, 255, 0.14) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(61, 158, 255, 0.14) 1px, transparent 1px);
   background-size: 64px 64px;
   pointer-events: none;
 }
-
-/* =========================================
-   CIRCUIT EFFECT
-========================================= */
 
 .circuit-overlay {
   position: absolute;
@@ -104,27 +96,11 @@ button {
   z-index: 0;
   opacity: 0.16;
   background-image:
-    linear-gradient(
-      90deg,
-      transparent 0 47%,
-      rgba(46, 160, 255, 0.35) 47.2% 47.35%,
-      transparent 47.5%
-    ),
-    linear-gradient(
-      0deg,
-      transparent 0 65%,
-      rgba(46, 160, 255, 0.25) 65.2% 65.35%,
-      transparent 65.5%
-    );
-  background-size:
-    420px 280px,
-    360px 260px;
+    linear-gradient(90deg, transparent 0 47%, rgba(46, 160, 255, 0.35) 47.2% 47.35%, transparent 47.5%),
+    linear-gradient(0deg, transparent 0 65%, rgba(46, 160, 255, 0.25) 65.2% 65.35%, transparent 65.5%);
+  background-size: 420px 280px, 360px 260px;
   pointer-events: none;
 }
-
-/* =========================================
-   MOVING SCANLINE
-========================================= */
 
 .scanline {
   position: absolute;
@@ -133,36 +109,19 @@ button {
   height: 2px;
   top: 0;
   z-index: 2;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(74, 178, 255, 0.8),
-    transparent
-  );
+  background: linear-gradient(90deg, transparent, rgba(74, 178, 255, 0.8), transparent);
   box-shadow: 0 0 18px rgba(0, 145, 255, 0.65);
   opacity: 0.55;
   pointer-events: none;
   animation: scanMove 8s linear infinite;
 }
 
-/* =========================================
-   LOGIN / REGISTER GLASS CARD
-========================================= */
-
 .glass-card {
   position: relative;
   z-index: 10;
   background:
-    linear-gradient(
-      145deg,
-      rgba(6, 23, 42, 0.76),
-      rgba(2, 11, 23, 0.82)
-    ),
-    radial-gradient(
-      circle at 50% 0%,
-      rgba(25, 150, 255, 0.15),
-      transparent 42%
-    );
+    linear-gradient(145deg, rgba(6, 23, 42, 0.76), rgba(2, 11, 23, 0.82)),
+    radial-gradient(circle at 50% 0%, rgba(25, 150, 255, 0.15), transparent 42%);
   border: 1px solid rgba(66, 155, 230, 0.45);
   box-shadow:
     0 32px 100px rgba(0, 42, 96, 0.32),
@@ -176,7 +135,6 @@ button {
   will-change: transform;
 }
 
-/* Top glowing line */
 .glass-card::before {
   content: "";
   position: absolute;
@@ -184,16 +142,10 @@ button {
   right: 10%;
   top: 0;
   height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    #52c8ff,
-    transparent
-  );
+  background: linear-gradient(90deg, transparent, #52c8ff, transparent);
   box-shadow: 0 0 20px rgba(35, 156, 255, 0.9);
 }
 
-/* Inner border */
 .glass-card::after {
   content: "";
   position: absolute;
@@ -203,43 +155,24 @@ button {
   pointer-events: none;
 }
 
-/* =========================================
-   INPUT FIELDS
-========================================= */
-
 .field {
-  transition:
-    border-color 0.25s ease,
-    box-shadow 0.25s ease,
-    transform 0.25s ease,
-    background 0.25s ease;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease, background 0.25s ease;
 }
 
 .field:focus-within {
   border-color: rgba(39, 154, 255, 0.9);
-  box-shadow:
-    0 0 0 3px rgba(24, 140, 255, 0.08),
-    0 0 22px rgba(0, 119, 255, 0.14);
+  box-shadow: 0 0 0 3px rgba(24, 140, 255, 0.08), 0 0 22px rgba(0, 119, 255, 0.14);
   background: rgba(6, 25, 45, 0.95);
   transform: translateY(-1px);
 }
 
-/* =========================================
-   BUTTON EFFECT
-========================================= */
-
 .primary-glow {
-  transition:
-    transform 0.25s ease,
-    box-shadow 0.25s ease,
-    filter 0.25s ease;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, filter 0.25s ease;
 }
 
 .primary-glow:hover {
   transform: translateY(-2px);
-  box-shadow:
-    0 12px 35px rgba(0, 118, 255, 0.36),
-    0 0 32px rgba(0, 118, 255, 0.28);
+  box-shadow: 0 12px 35px rgba(0, 118, 255, 0.36), 0 0 32px rgba(0, 118, 255, 0.28);
   filter: brightness(1.08);
 }
 
@@ -247,14 +180,8 @@ button {
   transform: translateY(0);
 }
 
-/* =========================================
-   LINK EFFECT
-========================================= */
-
 .link-glow {
-  transition:
-    color 0.2s ease,
-    text-shadow 0.2s ease;
+  transition: color 0.2s ease, text-shadow 0.2s ease;
 }
 
 .link-glow:hover {
@@ -262,21 +189,15 @@ button {
   text-shadow: 0 0 14px rgba(49, 164, 255, 0.55);
 }
 
-/* =========================================
-   ANIMATIONS
-========================================= */
-
 @keyframes backgroundGlow {
   0% {
     transform: scale(1) translate(-2%, -1%);
     opacity: 0.45;
   }
-
   50% {
     transform: scale(1.08) translate(2%, 2%);
     opacity: 0.75;
   }
-
   100% {
     transform: scale(1.15) translate(-1%, 3%);
     opacity: 0.55;
@@ -285,27 +206,20 @@ button {
 
 @keyframes scanMove {
   0% {
-    transform: translateY(-35vh);
+    transform: translateY(-5vh);
     opacity: 0;
   }
-
   10% {
     opacity: 0.7;
   }
-
   90% {
     opacity: 0.7;
   }
-
   100% {
     transform: translateY(110vh);
     opacity: 0;
   }
 }
-
-/* =========================================
-   TABLET
-========================================= */
 
 @media (max-width: 1024px) {
   .auth-shell {
@@ -315,47 +229,24 @@ button {
   }
 }
 
-/* =========================================
-   MOBILE RESPONSIVE BACKGROUND
-========================================= */
-
 @media (max-width: 767px) {
   .auth-shell {
-    min-height: 100vh;
-    min-height: 100dvh;
     padding-top: 5rem;
     padding-bottom: 4rem;
     background-size: cover;
-    background-position: center top;
-    background-repeat: no-repeat;
+    background-position: center;
     background-attachment: scroll;
   }
 
-  .auth-shell::after {
-    background: linear-gradient(
-      to bottom,
-      rgba(1, 7, 16, 0.05),
-      rgba(1, 7, 16, 0.22)
-    );
+  .grid-overlay {
+    background-size: 42px 42px;
+    opacity: 0.07;
   }
 
   .circuit-overlay {
     opacity: 0.08;
-    background-size: 300px 220px, 280px 200px;
-  }
-
-  .glass-card {
-    width: min(92%, 440px);
-    margin-left: auto;
-    margin-right: auto;
-    backdrop-filter: blur(12px) saturate(120%);
-    -webkit-backdrop-filter: blur(12px) saturate(120%);
   }
 }
-
-/* =========================================
-   SMALL MOBILE DEVICES
-========================================= */
 
 @media (max-width: 480px) {
   .auth-shell {
@@ -382,10 +273,6 @@ button {
   }
 }
 
-/* =========================================
-   LANDSCAPE MOBILE
-========================================= */
-
 @media (max-height: 600px) and (orientation: landscape) {
   .auth-shell {
     background-size: cover;
@@ -394,10 +281,6 @@ button {
     padding-bottom: 2rem;
   }
 }
-
-/* =========================================
-   REDUCED MOTION
-========================================= */
 
 @media (prefers-reduced-motion: reduce) {
   .scanline,

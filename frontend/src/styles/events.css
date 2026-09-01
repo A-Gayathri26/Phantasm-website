@@ -8,29 +8,26 @@
   --muted: #8b94a3;
 }
 
-* {
+.event-app {
+  background: var(--void);
+  color: var(--parchment);
+  font-family: 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  scroll-behavior: smooth;
+}
+
+.event-app * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-html {
-  scroll-behavior: smooth;
-}
-
-body {
-  background: var(--void);
-  color: var(--parchment);
-  font-family: 'Inter', sans-serif;
-  -webkit-font-smoothing: antialiased;
-}
-
-button {
+.event-app button {
   font: inherit;
   color: inherit;
 }
 
-::selection {
+.event-app ::selection {
   background: var(--arcane);
   color: var(--void);
 }

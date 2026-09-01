@@ -1,130 +1,90 @@
-import { useLayoutEffect, useRef } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-
-gsap.registerPlugin(ScrollTrigger);
-
+import CountdownTimer from './CountdownTimer';
+import { CalendarDays, ChevronDown, Trophy } from 'lucide-react';
 
 export default function Hero() {
-  const rootRef = useRef(null);
-
-  useLayoutEffect(() => {
-    const root = rootRef.current;
-    if (!root) return;
-
-    const ctx = gsap.context(() => {
-      const tl = gsap.timeline({
-        defaults: { ease: "power3.out" },
-        delay: 0.15,
-      });
-      tl.fromTo(
-        "[data-hero='eyebrow']",
-        { y: 18, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.6 },
-      )
-        .fromTo(
-          "[data-hero='title']",
-          { y: 44, opacity: 0, letterSpacing: "0.4em" },
-          { y: 0, opacity: 1, letterSpacing: "0.15em", duration: 0.9 },
-          "-=0.25",
-        )
-        .fromTo(
-          "[data-hero='sub']",
-          { y: 24, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.7 },
-          "-=0.45",
-        )
-        .fromTo(
-          "[data-hero='cta']",
-          { scale: 0.9, opacity: 0 },
-          { scale: 1, opacity: 1, duration: 0.6 },
-          "-=0.35",
-        );
-
-      gsap.utils.toArray("[data-reveal]").forEach((el) => {
-        gsap.fromTo(
-          el,
-          { y: 44, opacity: 0 },
-          {
-            y: 0,
-            opacity: 1,
-            duration: 0.85,
-            ease: "power2.out",
-            scrollTrigger: {
-              trigger: el,
-              start: "top 88%",
-              toggleActions: "play none none none",
-            },
-          },
-        );
-      });
-    }, root);
-
-    return () => ctx.revert();
-  }, []);
-
   return (
-    <section className="relative z-10 mx-auto max-w-6xl px-6 pt-4 pb-12 sm:px-10">
-      <div
-        ref={rootRef}
-        className="relative overflow-hidden rounded-3xl border border-sky-400/20 shadow-[0_0_50px_rgba(56,189,248,0.14)]"
-      >
-        <div
-            className="relative min-h-[400px] bg-cover bg-center bg-no-repeat brightness-110 contrast-110 saturate-125 sm:min-h-[520px]"
-            style={{
-              backgroundImage: "url('/images/backgroung.webp')",
-  }}
->
-          <div className="absolute inset-0 bg-gradient-to-b from-[#02040a]/55 via-[#02040a]/55 to-[#02040a]/90" />
+    <section className="relative w-full min-h-screen bg-black overflow-x-hidden flex items-start justify-start pt-18 md:pt-20">
+      {/* Background layer - Full viewport coverage */}
+      <div className="absolute inset-0 top-0 bg-black w-full h-full">
+        {/* Keep the wide composition for desktop and use the transparent artwork on mobile. */}
+        <img
+          src="/assets/hero-bg.jpg"
+          alt="Phantasm hero background"
+          className="pointer-events-none absolute inset-0 h-full w-full object-cover hidden md:block"
+          style={{ objectPosition: 'center 18%' }}
+        />
 
-          
+        <img
+          src="/assets/dragon-transparent.png"
+          alt=""
+          aria-hidden="true"
+          className="mobile-dragon absolute md:hidden"
+        />
 
-          <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center">
-            <p
-              data-hero="eyebrow"
-              className="text-[10px] font-semibold uppercase tracking-[0.5em] text-sky-300/80 opacity-0"
-            >
-              National Fest · 2026
-            </p>
-            <h1
-              data-hero="title"
-              className="mt-4 font-serif text-[clamp(2.6rem,9vw,5.5rem)] tracking-[0.15em] text-sky-50 opacity-0 drop-shadow-[0_0_28px_rgba(56,189,248,0.5)]"
-            >
-              QUESTS
-            </h1>
-            <p
-              data-hero="sub"
-              className="mt-3 max-w-lg text-sm opacity-0 text-sky-200/85 sm:text-base"
-            >
-              Step through the archway. Claim your quests. Etch your name into
-              the ledger of Phantasm.
-            </p>
-            <a
-              data-hero="cta"
-              href="#register"
-              className="mt-8 rounded-full border border-sky-400/50 bg-sky-500/10 px-8 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-sky-100 opacity-0 shadow-[0_0_24px_rgba(56,189,248,0.25)] backdrop-blur transition hover:bg-sky-500/25"
-            >
-              Enter the Gate
-            </a>
+        {/* Gradient overlays optimized for mobile and desktop */}
+        <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/30 via-80% to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent via-50% to-black/40" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-transparent" />
+      </div>
+
+      {/* Content */}
+      <div className="relative z-10 max-w-7xl w-full px-[68px] md:px-[90px] min-h-screen flex flex-col md:flex-row md:items-start">
+        <div className="hero-copy max-w-xl w-full flex flex-col justify-start pt-[32px] md:pt-[40px] md:h-auto h-auto pb-10 md:pb-0">
+          <p className="text-blue-400 text-lg sm:text-xl md:text-2xl tracking-[0.3em] font-body mb-3 sm:mb-4">
+            WELCOME TO
+          </p>
+
+          <h1 className="font-gothic text-5xl sm:text-6xl md:text-7xl lg:text-8xl text-white leading-tight sm:leading-none drop-shadow-[0_0_25px_rgba(96,165,250,0.5)]">
+            PHANTASM
+          </h1>
+          <p className="font-serif2 text-blue-200 text-base sm:text-lg md:text-xl tracking-[0.35em] mt-2">
+            CSE SYMPOSIUM 2026
+          </p>
+
+          <div className="w-16 sm:w-20 h-[2px] bg-blue-500 shadow-glow my-3 sm:my-4" />
+
+          <p className="font-serif2 italic text-slate-200 text-base sm:text-lg md:text-xl mb-2 sm:mb-3">
+            Ideate • Innovate • Transcend
+          </p>
+
+          <p className="max-w-xl font-serif2 font-semibold tracking-wide text-sm sm:text-base md:text-lg leading-relaxed text-transparent bg-clip-text bg-gradient-to-r from-blue-200 via-cyan-200 to-blue-400 drop-shadow-[0_0_14px_rgba(96,165,250,0.65)] mb-3 sm:mb-4">
+            A national-level technical symposium where bright minds meet, create, and shape the future.
+          </p>
+
+          <p className="text-blue-400 text-sm sm:text-base tracking-[0.3em] font-body mb-3">
+            THE COUNTDOWN BEGINS
+          </p>
+
+          <CountdownTimer />
+
+        
+
+          <div className="mt-4 sm:mt-5 inline-flex w-fit items-center gap-4 sm:gap-5 rounded-md border border-blue-400/35 bg-blue-950/25 px-4 py-3 text-slate-200 shadow-[0_0_24px_rgba(59,130,246,0.2)] backdrop-blur-sm">
+            <div className="flex items-center gap-2">
+              <CalendarDays className="text-blue-400" size={15} />
+              <div>
+                <span className="block text-xs sm:text-sm text-blue-300 tracking-[0.2em] font-body">DATE</span>
+                <span className="font-serif2 text-base sm:text-lg tracking-wide">22/09/26</span>
+              </div>
+            </div>
+            <span className="h-8 w-px bg-blue-400/30" />
+            <div className="flex items-center gap-2">
+              <Trophy className="text-blue-400" size={15} />
+              <div>
+                <span className="block text-xs sm:text-sm text-blue-300 tracking-[0.2em] font-body">POOL PRIZE</span>
+                <span className="font-serif2 text-base sm:text-lg tracking-wide">30,000</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="mx-auto mt-7 flex max-w-3xl items-center justify-between px-2 text-[10px] uppercase tracking-[0.3em] text-sky-400/60">
-        {["Gate", "Choose", "Details", "Team", "Seal"].map((label, i) => (
-          <div key={label} className="flex items-center gap-2">
-            <span
-              className={`grid h-6 w-6 place-items-center rounded-full border ${
-                i === 0
-                  ? "border-sky-400/60 bg-sky-400/20 text-sky-200"
-                  : "border-sky-400/20 text-sky-400/50"
-              }`}
-            >
-              {i + 1}
-            </span>
-            <span className="hidden sm:inline">{label}</span>
-          </div>
-        ))}
+      {/* Scroll to explore - Hidden on mobile, visible on tablet+ */}
+      <div className="hidden sm:flex absolute bottom-6 sm:bottom-8 left-1/2 -translate-x-1/2 z-10 flex-col items-center gap-1 animate-bounce">
+        <ChevronDown className="text-blue-400" size={18} />
+        <span className="text-blue-300 text-xs sm:text-sm tracking-[0.3em] font-body">
+          SCROLL TO EXPLORE
+        </span>
       </div>
     </section>
   );

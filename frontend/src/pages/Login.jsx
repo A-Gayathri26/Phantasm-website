@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { gsap } from 'gsap'
 import AuthLayout from '../components/AuthLayout'
 import Field from '../components/Field'
 import { loginUser } from '../lib/api'
 
 export default function Login() {
+  const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState(false)
   const [remember, setRemember] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -29,9 +30,7 @@ export default function Login() {
       const res = await loginUser({ email: data.email, password: data.password })
       if (res?.token) localStorage.setItem('authToken', res.token)
       if (res?.user) localStorage.setItem('authUser', JSON.stringify(res.user))
-      alert('Login successful!')
-      // No protected dashboard route exists yet in this project — once you
-      // add one, replace the alert above with: navigate('/dashboard')
+      navigate('/payment', { replace: true })
     } catch (err) {
       setError(err.message)
     } finally {

@@ -1,6 +1,6 @@
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
-async function request(path, options = {}) {
+export async function apiFetch(path, options = {}) {
   const res = await fetch(`${API_BASE}${path}`, {
     credentials: 'include',
     headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
@@ -19,6 +19,10 @@ async function request(path, options = {}) {
   }
 
   return data;
+}
+
+async function request(path, options = {}) {
+  return apiFetch(path, options);
 }
 
 export const registerUser = (payload) =>
